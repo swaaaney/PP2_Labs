@@ -38,3 +38,10 @@ print(is_valid_email("hello world"))
 def word(text):
     return (re.findall(r"\d+", text))
 print(word("Hello 1234 you"))
+
+def is_first_uppercase(text):
+    return text[0].isupper() if text else False 
+
+print(is_first_uppercase("Hello akku how are you"))  # ➝ True
+print(is_first_uppercase("world Hello"))  # ➝ False
+print(is_first_uppercase(""))       # ➝ False
