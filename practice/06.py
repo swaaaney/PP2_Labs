@@ -34,3 +34,7 @@ def is_valid_email(text):
         return "False"
 print(is_valid_email("akku.yermankyzy@bk.ru"))
 print(is_valid_email("hello world"))
+
+def word(text):
+    return (re.findall(r"\d+", text))
+print(word("Hello 1234 you"))
