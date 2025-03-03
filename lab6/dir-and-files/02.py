@@ -11,3 +11,4 @@ def check_access(path):
         "writable": os.access(path, os.W_OK),
         "executable": os.access(path, os.X_OK)
     }
+print(check_access("text.txt"))

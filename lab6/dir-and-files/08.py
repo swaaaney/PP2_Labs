@@ -10,3 +10,4 @@ def delete_file(file_path):
         print(f"Deleted: {file_path}")
     else:
         print("Cannot delete, no access or file does not exist.")
+delete_file("test.txt")

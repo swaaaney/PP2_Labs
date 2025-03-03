@@ -6,4 +6,6 @@ import string
 
 def write_list_to_file(file_path, data_list):
     with open(file_path, 'w') as file:
-        file.writelines(f"{item}\n" for item in data_list)
+        for item in data_list:
+            file.write(str(item) + "\n")
+write_list_to_file("output.txt", ["apple", "banana", "cherry"])
