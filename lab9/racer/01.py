@@ -12,7 +12,7 @@ pygame.display.set_caption("Road Game")
 
 # Функция загрузки изображений
 def load_image(name, size=None):
-    path = os.path.join(os.getcwd(), "lab8", "racer", name)
+    path = os.path.join(os.getcwd(), "lab9", "racer", name)
     image = pygame.image.load(path)
     return pygame.transform.scale(image, size) if size else image
 
@@ -23,9 +23,9 @@ enemy_img = load_image("Enemy.png")
 coin_img = load_image("coin.png", (30, 30))  # Устанавливаем размер монеты
 
 # Музыка и звуки
-pygame.mixer.music.load(os.path.join(os.getcwd(), "lab8", "racer", "background.wav"))
+pygame.mixer.music.load(os.path.join(os.getcwd(), "lab9", "racer", "background.wav"))
 pygame.mixer.music.play(-1)
-crash_sound = pygame.mixer.Sound(os.path.join(os.getcwd(), "lab8", "racer", "crash.wav"))
+crash_sound = pygame.mixer.Sound(os.path.join(os.getcwd(), "lab9", "racer", "crash.wav"))
 
 # Шрифты
 font = pygame.font.SysFont("Verdana", 60)
