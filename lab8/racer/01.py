@@ -5,28 +5,34 @@ import os
 
 pygame.init()
 
+# Параметры окна
 WIDTH, HEIGHT = 400, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Road Game")
 
+# Функция загрузки изображений
 def load_image(name, size=None):
     path = os.path.join(os.getcwd(), "lab8", "racer", name)
     image = pygame.image.load(path)
     return pygame.transform.scale(image, size) if size else image
 
+# Загрузка ресурсов
 background = load_image("AnimatedStreet.png")
 player_img = load_image("Player.png")
 enemy_img = load_image("Enemy.png")
-coin_img = load_image("coin.png", (30, 30)) 
+coin_img = load_image("coin.png", (30, 30))  # Устанавливаем размер монеты
 
+# Музыка и звуки
 pygame.mixer.music.load(os.path.join(os.getcwd(), "lab8", "racer", "background.wav"))
 pygame.mixer.music.play(-1)  
 crash_sound = pygame.mixer.Sound(os.path.join(os.getcwd(), "lab8", "racer","crash.wav"))
 
+# Шрифты
 font = pygame.font.SysFont("Verdana", 60)
 font_small = pygame.font.SysFont("Verdana", 20)
 game_over = font.render("Game Over", True, "black")
 
+# Игровые параметры
 FPS = 60
 clock = pygame.time.Clock()
 PLAYER_SPEED = 5
@@ -34,6 +40,7 @@ ENEMY_SPEED = 5
 COIN_SPEED = 4
 score = 0  
 
+# Класс игрока
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -47,6 +54,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_RIGHT] and self.rect.right < WIDTH:
             self.rect.move_ip(PLAYER_SPEED, 0)
 
+# Класс врага
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -63,6 +71,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = random.randint(0, WIDTH - self.rect.w)
         self.rect.y = -random.randint(50, 150)
 
+# Класс монет
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -78,7 +87,7 @@ class Coin(pygame.sprite.Sprite):
     def generate_random_rect(self):
         self.rect.x = random.randint(50, WIDTH - 50)
         self.rect.y = -random.randint(50, 150)
-
+# Создание объектов
 player = Player()
 enemy = Enemy()
 coin = Coin()
@@ -102,10 +111,10 @@ while running:
     player.move()
     enemy.move()
     coin.move()
-
+    # Отрисовка всех объектов
     for entity in all_sprites:
         screen.blit(entity.image, entity.rect)
-
+    # Проверка столкновения игрока и врага
     if pygame.sprite.spritecollideany(player, enemy_sprites):
         crash_sound.play()
         pygame.time.delay(int(crash_sound.get_length() * 1000))
@@ -114,14 +123,14 @@ while running:
         pygame.display.flip()
         time.sleep(2)
         running = False
-
+    # Проверка столкновения с монетами
     if pygame.sprite.spritecollide(player, coin_sprites, True):
         score += 1
         new_coin = Coin()
         all_sprites.add(new_coin)
         coin_sprites.add(new_coin)
 
-
+    # Отображение счета
     score_text = font_small.render(f"Score: {score}", True, "black")
     screen.blit(score_text, (WIDTH - 100, 10))
 
