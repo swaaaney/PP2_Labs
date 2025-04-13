@@ -128,7 +128,7 @@ while running:
         
         # Check food disappearance (only for big food)
         if food.weight == 3 and food.timer:
-            if pygame.time.get_ticks() - food.timer > 5000:  # 5 seconds
+            if pygame.time.get_ticks() - food.timer > 5:  # 5 seconds
                 food.generate_random_pos(snake)
 
         if snake.check_collision(food):
