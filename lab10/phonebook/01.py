@@ -4,7 +4,7 @@ import csv
 # Подключение к базе данных
 conn = psycopg2.connect(
     host="localhost",
-    database="postgres",
+    database="phonebook",
     user="postgres",
     password="potkyz2007!"
 )

@@ -1,6 +1,7 @@
 import pygame
 import random
 import psycopg2
+import time
 
 WIDTH, HEIGHT = 600, 600
 CELL = 30
@@ -17,7 +18,7 @@ ORANGE = (255, 165, 0)
 # Подключение к базе данных
 conn = psycopg2.connect(
     host="localhost",
-    dbname="postgres",
+    dbname="snake_game",
     user="postgres",
     password="1234",
     port=5432
@@ -104,6 +105,37 @@ class Food:
         self.weight = 3 if random.random() < 0.2 else 1
         self.timer = pygame.time.get_ticks() if self.weight == 3 else None
 
+class TemporaryWall:
+    def __init__(self, snake, food):
+        self.blocks = []
+        self.active = False
+        self.spawn_time = 0
+        self.duration = 5000
+
+    def spawn(self, snake, food):
+        while True:
+            x = random.randint(0, WIDTH // CELL - 2)
+            y = random.randint(0, HEIGHT // CELL - 2)
+            new_blocks = [Point(x, y), Point(x+1, y), Point(x, y+1), Point(x+1, y+1)]
+            collision = any(
+                any(segment.x == b.x and segment.y == b.y for segment in snake.body)
+                or (food.pos.x == b.x and food.pos.y == b.y)
+                for b in new_blocks
+            )
+            if not collision:
+                self.blocks = new_blocks
+                self.active = True
+                self.spawn_time = pygame.time.get_ticks()
+                break
+
+    def draw(self, screen):
+       if self.active:
+           for b in self.blocks:
+               pygame.draw.rect(screen, WHITE, (b.x * CELL, b.y * CELL, CELL, CELL))
+    def update(self):
+        if self.active and pygame.time.get_ticks() - self.spawn_time > self.duration:
+            self.active = False
+
 def run_game(username):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -111,6 +143,9 @@ def run_game(username):
 
     snake = Snake()
     food = Food(snake)
+    wall = TemporaryWall(snake, food)
+    wall_timer = pygame.time.get_ticks()
+
     clock = pygame.time.Clock()
     FPS = 5
     score = 0
@@ -143,6 +178,18 @@ def run_game(username):
                         print("Paused.")
                     else:
                         print("Unpaused.")
+                elif event.key == pygame.K_s:
+                    if paused:
+                        print(f"Saved. Level: {level}, Score: {score}")
+                        cur.execute("SELECT * FROM snake_users WHERE username = %s", (username,))
+                        user = cur.fetchone()
+                        if user:
+                            cur.execute("UPDATE snake_users SET score = %s, level = %s WHERE username = %s", (score, level, username))
+                        else:
+                            cur.execute("INSERT INTO snake_users (username, score, level) VALUES (%s, %s, %s)", (username, score, level))
+                        conn.commit()
+                    else:
+                        print("Unpaused.")
 
         if not paused and snake.alive:
             snake.move()
@@ -150,6 +197,17 @@ def run_game(username):
             if food.weight == 3 and food.timer:
                 if pygame.time.get_ticks() - food.timer > 5000:
                     food.generate_random_pos(snake)
+
+            if not wall.active and pygame.time.get_ticks() - wall_timer > random.randint(7000, 15000):
+                wall.spawn(snake, food)
+                wall_timer = pygame.time.get_ticks()
+
+            wall.update()
+
+            if wall.active:
+                for b in wall.blocks:
+                    if snake.body[0].x == b.x and snake.body[0].y == b.y:
+                        snake.alive = False
 
             if snake.check_collision(food):
                 score += food.weight
@@ -162,6 +220,7 @@ def run_game(username):
         draw_grid(screen)
         snake.draw(screen)
         food.draw(screen)
+        wall.draw(screen)
 
         font = pygame.font.SysFont("Verdana", 20)
         score_text = font.render(f"Score: {score}", True, WHITE)
@@ -176,7 +235,7 @@ def run_game(username):
         pygame.display.flip()
         clock.tick(FPS)
 
-    # Сохраняем результат
+    # Сохраняем результат после завершения
     cur.execute("SELECT * FROM snake_users WHERE username = %s", (username,))
     user = cur.fetchone()
     if user:

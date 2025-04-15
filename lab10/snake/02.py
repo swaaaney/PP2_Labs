@@ -9,19 +9,18 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-username = input("Напишите свое имя: ")
+username = input("Enter your username: ")
 
 cur.execute("SELECT score, level FROM snake_users WHERE username = %s", (username,))
 row = cur.fetchone()
-
 if row:
     print(f"Welcome back, {username}! Your last score: {row[0]}, level: {row[1]}")
 else:
     cur.execute("INSERT INTO snake_users (username, score, level) VALUES (%s, %s, %s)", (username, 0, 1))
     conn.commit()
 
-start = input("Do you want to start the game? (да/нет): ")
-if start.lower() == "да":
+start = input("Do you want to start the game? (yes/no): ")
+if start.lower() == "yes":
     print("Starting the game...")
     score, level = run_game(username)
     print(f"Game over! Final score: {score}, level: {level}")
