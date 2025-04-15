@@ -27,4 +27,4 @@ if start.lower() == "yes":
 else:
     cur.execute("DELETE FROM snake_users WHERE username = %s AND score = 0 AND level = 1", (username,))
     conn.commit()
-    print("Пока-пока!")
+    print("Bye bye")
